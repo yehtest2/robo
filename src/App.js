@@ -1,25 +1,48 @@
-import logo from './logo.svg';
-import './App.css';
+import Cardlist from "./components/Cardlist";
+import SearchBox from "./components/Searchbox";
+import Scroll from "./components/Scroll";
+import ErrorBoundry from "./components/ErrorBoundry";
+import React, { Component } from "react";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      robots: [],
+      searchfield: "",
+    };
+  }
+  componentDidMount() {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((r) => {
+        console.log(r);
+        return r.json();
+      })
+      .then((user) => {
+        console.log(user);
+        this.setState({ robots: user });
+      });
+  }
+  onSearchChange = (e) => {
+    this.setState({ searchfield: e.target.value });
+  };
+  render() {
+    const field = this.state.robots.filter((robots) => {
+      return robots.name
+        .toLowerCase()
+        .includes(this.state.searchfield.toLowerCase());
+    });
+    return (
+      <div className="tc">
+        <h1>RoboFriend</h1>
+        <SearchBox searchChange={this.onSearchChange} />
+        <Scroll>
+          <ErrorBoundry>
+            <Cardlist robots={field} />
+          </ErrorBoundry>
+        </Scroll>
+      </div>
+    );
+  }
 }
-
 export default App;
